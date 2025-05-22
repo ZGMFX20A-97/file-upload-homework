@@ -24,14 +24,17 @@ export const uploadFile = async (key:string, body:Buffer) => {
       }
     };
 
-export const listFiles = async (pageSize:string)=>{
+export const listFiles = async (userId:string,pageSize:string)=>{
 
   const objects = [];
-
+  //ログインユーザーにマッチしたファイルのみ取り出すようにPrefixを設定する
+  const prefix = `uploads/${userId}`;
   try {
     const paginator = paginateListObjectsV2(
       { client, pageSize: Number.parseInt(pageSize) },
-      { Bucket: process.env.AWS_BUCKET_NAME! },
+      { Bucket: process.env.AWS_BUCKET_NAME!,
+        Prefix:prefix
+      }
     );
 
     for await (const page of paginator) {

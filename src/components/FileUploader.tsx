@@ -40,7 +40,8 @@ const formSchema = z.object({
 async function onSubmit(data: z.infer<typeof formSchema>) {
 	const formData = new FormData();
 	formData.append("file", data.file);
-	const res = await fetch("http://localhost:3000/upload", {
+  //今度はログインユーザー情報取得を割愛し、userIdパラメーターにDB初期化時に存在するユーザーIDー１をハードコードで入れる。
+	const res = await fetch("http://localhost:3000/upload/1", {
 		method: "POST",
 		body: formData
 	});

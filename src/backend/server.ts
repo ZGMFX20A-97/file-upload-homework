@@ -13,16 +13,17 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 
 const ACCEPTED_IMAGE_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/webp",
-	"image/tif",
-	"image/bmp",
-	"image/gif"
+	".jpeg",
+	".png",
+	".webp",
+	".tif",
+	".bmp",
+	".gif"
 ];
 //upload.single("file")はミドルウェアとしてリクエスト内の単一のファイルをパースしてrequestに入れる
-app.post("/upload", upload.single("file"), async (req, res) => {
-
+app.post("/upload/:userId", upload.single("file"), async (req, res) => {
+    //パスパラメーターからファイルをアップロードしたユーザーのIDを取得
+    const userId = req.params.userId;
     //パーサーによって、リクエストからアップロードされたファイルを取り出せる
     const file = req.file;
     //ファイルの拡張子を取得
@@ -31,8 +32,8 @@ app.post("/upload", upload.single("file"), async (req, res) => {
         res.status(400).json({ errorMessage: "画像ファイルをアップロードしてください" });
     }
     //S3へアップロードするときにオブジェクトを識別するためのキーが必要
-    //重複しないようにcrypto.randomUUID()でランダムなUUIDでつける
-    const key = `uploads/${crypto.randomUUID()}${ext}`;
+    //どのユーザーがアップロードしたのかを判別するためにキーの中にユーザーIDを組み込む
+    const key = `uploads/${userId}${ext}`;
 
     const body = await readFile(file.path);
 
@@ -46,9 +47,12 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     }
 
 });
-app.get("/getFiles", async (req, res) => {
+app.get("/getFiles/:userId", async (req, res) => {
     try {
-        const objects = await listFiles("3");
+        //パスパラメーターからファイルをアップロードしたユーザーのIDを取得
+        const userId = req.params.userId;
+
+        const objects = await listFiles(userId,"3");
         res.status(200).json(objects)
     } catch (err) {
         res.status(500).json({ errorMessage: err.message });
