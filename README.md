@@ -2,7 +2,7 @@
 
 # モージュル概要
 
-ユーザーからファイルを受け取り、そのファイルを外部ストレージサービスへアップロードし、保存する機能、またアップロードされた画像をAmazon S3 URIを通して、プレビュうを表示する機能を持つ。
+ユーザーからファイルを受け取り、そのファイルを外部ストレージサービスへアップロードし保存する機能、またアップロードされた画像をAmazon S3 URIを通して、プレビューを表示する機能を持つ。
 
 # シーケンス
 
@@ -10,11 +10,11 @@
 
 ↓
 
-JavaScript ファイルをFormDataへ詰め込む
+JavaScriptでファイルをFormDataへ詰め込む
 
 ↓
 
-fetch で /upload APIを通してバックエンドへPOSTリクエストを送る
+fetchで /upload APIを通してバックエンドへPOSTリクエストを送る
 
 ↓
 
@@ -22,25 +22,23 @@ fetch で /upload APIを通してバックエンドへPOSTリクエストを送�
 
 ↓
 
-受け取ったファイルデータをパースすする。
+受け取ったファイルデータをパースする
 
 ↓
 
-ファイルデータをS3へ送り、保存する。
+ファイルデータをS3へ送り、保存する
 
 ↓
 
-S3から成功したレスポンスを受け取る。
+S3から成功したレスポンスを受け取る
 
 ↓
 
-バックエンドでアップロードしたファイルのURIを生成し、DBへ保存する。[https://$](https://$/){bucketName}.s3.amazonaws.com/${key}
+バックエンドでアップロードしたファイルのURIを生成し、DBへ保存する。例：https://{bucketName}.s3.amazonaws.com/${key}
 
 ↓
 
-FilesPreviewコンポーネントで /getFiles APIを通してアップロードされたバケット内の
-
-フロントでURIを使って画像のプレビューを表示する。
+FilesPreviewコンポーネントで /getFiles APIを通してアップロードされたバケット内のフロントでURIを使って画像のプレビューを表示する。
 
 # API
 
@@ -48,7 +46,7 @@ FilesPreviewコンポーネントで /getFiles APIを通してアップロード
 
 **RequestBody：formData{image/jpg || image/bmp || image/gif || image/png || image/tiff etc…}**
 
-**Response：StatusCode 200/400/500**
+**Response：StatusCode 201 Created/406 Not Acceptable/413 Payload Too Large/403 Forbidden/500 Internal Server Error**
 
 フロントからアップロードされたファイルを受け取り、S3へアップロードするためのAPI。
 
@@ -58,7 +56,8 @@ userIdをパスパラメータから取得し、S3バケットへアップロー
 
 **Request：**
 
-**Response： StatusCode 200/400/500**
+**Response： StatusCode 200 OK/401 Unauthorized/500 Internal Server Error**
+             List[string]
 
 アップロードしたファイルを取得する。
 
